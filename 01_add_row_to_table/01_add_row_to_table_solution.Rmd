@@ -1,0 +1,26 @@
+---
+title: "Modify HTML Tables in the HARD Way"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(kableExtra)
+library(xml2)
+quiz1 <- kable(mtcars[1:2, 1:2], "html") %>%
+  kable_styling(full_width = F)
+quiz1_xml <- kableExtra:::read_kable_as_xml(quiz1)
+new_row <- c("RStudio", "Conf", "2019")
+# You Start Here ---
+new_row_html <- lapply(new_row, htmltools::tags$td) %>%
+  htmltools::tags$tr() %>%
+  as.character() %>%
+  read_xml()
+quiz1_xml %>%
+  xml_child(2) %>%
+  xml_add_child(new_row_html)
+kableExtra:::as_kable_xml(quiz1_xml)
+```
